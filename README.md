@@ -212,52 +212,6 @@ CREATE TABLE chat_history (
 );
 ```
 
-## 👥 Pembagian Tugas (3 Anggota)
-
-### Anggota 1: Server & Networking
-**Tanggung Jawab:**
-- Implementasi `server.py` (main server)
-- Implementasi `client_handler.py` (threading per client)
-- Implementasi `utils.py` (packet handling)
-- Testing koneksi multi-client
-- Dokumentasi alur socket
-
-**File:**
-- `server/server.py`
-- `server/client_handler.py`
-- `server/utils.py`
-
-### Anggota 2: Database & Room Management
-**Tanggung Jawab:**
-- Implementasi `database_manager.py` (SQLite)
-- Implementasi `room_manager.py` (logic room)
-- Design database schema
-- Implementasi fitur owner (kick, close, delete)
-- Testing persistensi data
-
-**File:**
-- `server/database_manager.py`
-- `server/room_manager.py`
-- `database/chat_app.db`
-
-### Anggota 3: Client GUI & User Experience
-**Tanggung Jawab:**
-- Implementasi `client_network.py` (network client)
-- Implementasi `login_window.py` (UI login)
-- Implementasi `lobby_window.py` (UI lobby)
-- Implementasi `chat_window.py` (UI chat)
-- Implementasi `styles.py` (tema dark mode)
-- Emoji picker dan file transfer
-- Testing UI/UX
-
-**File:**
-- `client/client_network.py`
-- `client/client.py`
-- `client/login_window.py`
-- `client/lobby_window.py`
-- `client/chat_window.py`
-- `client/styles.py`
-
 ## 🔧 Troubleshooting
 
 ### Server tidak bisa diakses dari komputer lain
