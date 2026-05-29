@@ -1,0 +1,20 @@
+# Multiple Chat Rooms - Requirements
+# Python 3.8+
+
+# Core dependencies - PyQt5 akan menginstall dependencies yang kompatibel
+PyQt5>=5.15.0
+
+# Networking (built-in, but listed for clarity)
+# socket - included in Python standard library
+# threading - included in Python standard library
+# json - included in Python standard library
+
+# Database
+# sqlite3 - included in Python standard library
+
+# Additional utilities
+# dataclasses - included in Python 3.7+
+# typing - included in Python 3.5+
+# enum - included in Python standard library
+# datetime - included in Python standard library
+# base64 - included in Python standard library
