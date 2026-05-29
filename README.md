@@ -295,18 +295,4 @@ pip install PyQt5
 - [x] Multi-client dalam satu room
 - [x] Multiple rooms aktif bersamaan
 
-## 📄 Lisensi
-
-Project ini dibuat untuk keperluan akademik mata kuliah Jaringan Komputer.
-
-## 🙏 Credits
-
-- Python 3.x
-- PyQt5
-- SQLite3
-
 ---
-
-**Kelompok Jaringan Komputer**  
-*Tugas Besar - Multiple Chat Rooms*  
-Dibuat dengan ❤️ menggunakan Python
