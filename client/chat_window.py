@@ -165,7 +165,7 @@ class ChatWindow(QMainWindow):
     
     def __init__(self, client, room_name: str, is_owner: bool = False, parent=None):
         """
-        Initialize chat window.
+        Inisialisasi chat window
         
         Args:
             client: ChatClient instance
