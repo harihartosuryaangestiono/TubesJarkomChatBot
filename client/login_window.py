@@ -1,6 +1,6 @@
 """
-Login window for the chat client.
-Handles user authentication and connection to server.
+Login window untuk chat client.
+Menangani user authentication dan koneksi ke server.
 """
 
 import sys
@@ -15,11 +15,11 @@ from styles import get_style, COLORS
 
 
 class LoginWindow(QDialog):
-    """Login dialog for the chat application."""
+    """Login dialog untuk chat application."""
     
     def __init__(self, client, parent=None):
         """
-        Initialize login window.
+        Inisialisasi login window
         
         Args:
             client: ChatClient instance
@@ -32,7 +32,7 @@ class LoginWindow(QDialog):
         self.attempting_login = False
     
     def setup_ui(self):
-        """Setup the user interface."""
+        """Setup user interface"""
         self.setWindowTitle("Multiple Chat Rooms - Login")
         self.setFixedSize(450, 550)
         self.setStyleSheet(get_style("login"))
@@ -156,7 +156,7 @@ class LoginWindow(QDialog):
         self.username_input.setFocus()
     
     def connect_signals(self):
-        """Connect signals and slots."""
+        """Connect signals dan slots"""
         self.connect_btn.clicked.connect(self.on_connect_clicked)
         self.username_input.returnPressed.connect(self.on_connect_clicked)
         
@@ -167,7 +167,7 @@ class LoginWindow(QDialog):
         self.client.error_occurred.connect(self.on_error)
     
     def on_connect_clicked(self):
-        """Handle connect button click."""
+        """menangani connect button click"""
         if self.attempting_login:
             return
         
@@ -215,7 +215,7 @@ class LoginWindow(QDialog):
             self.loading_label.hide()
     
     def set_controls_enabled(self, enabled: bool):
-        """Enable/disable controls."""
+        """Enable/disable controls"""
         self.host_input.setEnabled(enabled)
         self.port_input.setEnabled(enabled)
         self.username_input.setEnabled(enabled)
@@ -226,7 +226,7 @@ class LoginWindow(QDialog):
             self.connect_btn.setText("Connecting...")
     
     def on_connected(self):
-        """Handle successful connection."""
+        """Menangani Koneksi sukses"""
         self.loading_label.setText("Connected! Logging in...")
         
         # Kirim login request
@@ -235,7 +235,7 @@ class LoginWindow(QDialog):
         ))
     
     def on_disconnected(self, message: str):
-        """Handle disconnection."""
+        """Menangani disconnection"""
         self.attempting_login = False
         self.set_controls_enabled(True)
         self.loading_label.hide()
@@ -244,7 +244,7 @@ class LoginWindow(QDialog):
             self.show_error(f"Connection lost: {message}")
     
     def on_login_response(self, success: bool, message: str, username: str):
-        """Handle login response."""
+        """Menangani login response"""
         if success:
             self.loading_label.setText("Login successful!")
             self.client.username = username
@@ -261,7 +261,7 @@ class LoginWindow(QDialog):
             self.show_error(f"Login failed: {message}")
     
     def on_error(self, message: str):
-        """Handle error."""
+        """Menangani error"""
         if not self.attempting_login:
             self.show_error(message)
         elif "Failed to connect" in message:
@@ -271,11 +271,11 @@ class LoginWindow(QDialog):
             self.show_error(message)
     
     def show_error(self, message: str):
-        """Show error message."""
+        """Tampilkan error message"""
         QMessageBox.critical(self, "Error", message)
     
     def closeEvent(self, event):
-        """Handle dialog close."""
+        """Menangani dialog close"""
         if self.attempting_login:
             self.client.disconnect()
         event.accept()
