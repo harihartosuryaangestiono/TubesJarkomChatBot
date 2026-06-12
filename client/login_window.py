@@ -1,6 +1,6 @@
 """
-Login window untuk chat client.
-Menangani user authentication dan koneksi ke server.
+Login window untuk chat client
+Menangani user authentication dan koneksi ke server
 """
 
 import sys
