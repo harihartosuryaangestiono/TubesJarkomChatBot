@@ -1,6 +1,6 @@
 """
-Client handler for the chat server.
-Manages individual client connections and message processing.
+Client handler untuk server chat
+Tujuan: Memanage koneksi2 client dan message processing.
 """
 
 import socket
@@ -17,7 +17,7 @@ from utils import (
 
 
 class ClientHandler(threading.Thread):
-    """Handles a single client connection."""
+    """Mengurus koneksi 1 klien."""
 
     def __init__(
         self,
@@ -28,12 +28,12 @@ class ClientHandler(threading.Thread):
         database_manager
     ):
         """
-        Initialize client handler.
+        Inisialisasi client handler
         
-        Args:
-            client_socket: Socket connection to client
+        Catatan:
+            client_socket: Socket connection ke client
             address: Client address tuple (ip, port)
-            server: Reference to main server instance
+            server: Referensi ke instance main server 
             room_manager: RoomManager instance
             database_manager: DatabaseManager instance
         """
@@ -49,7 +49,7 @@ class ClientHandler(threading.Thread):
         self.is_running = True
         self.current_room: Optional[str] = None
         
-        # File transfer settings
+        # Setting untuk file transfer
         self.file_transfer_dir = "file_transfers"
         os.makedirs(self.file_transfer_dir, exist_ok=True)
 
@@ -59,12 +59,12 @@ class ClientHandler(threading.Thread):
         
         try:
             while self.is_running:
-                # Receive data from client
+                # Menerima data dari client
                 data = self._receive_data()
                 if not data:
                     break
                 
-                # Process the packet
+                # Process paket tsb
                 self._process_packet(data)
                 
         except ConnectionResetError:
@@ -97,11 +97,11 @@ class ClientHandler(threading.Thread):
 
         packet_type = packet.get("type")
         
-        # Log received packet (excluding file data)
+        # Log menerima packet (exclude data file)
         if packet_type != PacketType.FILE.value:
             log_event("PACKET", f"Received {packet_type} from {self.username or 'unknown'}")
 
-        # Route to appropriate handler
+        # Route ke handler yang seharusnya
         handlers = {
             PacketType.LOGIN.value: self._handle_login,
             PacketType.CREATE_ROOM.value: self._handle_create_room,
@@ -142,7 +142,7 @@ class ClientHandler(threading.Thread):
             self.send_packet(response)
             return
 
-        # Check if username is already taken by active user
+        # Username sudah taken / belum
         if self.server.is_username_taken(username):
             response = create_packet(PacketType.LOGIN_RESPONSE, {
                 "success": False,
@@ -151,7 +151,7 @@ class ClientHandler(threading.Thread):
             self.send_packet(response)
             return
 
-        # Create or update user in database
+        # Create atau update user di database
         if not self.db.user_exists(username):
             success, _ = self.db.create_user(username)
             if not success:
@@ -164,7 +164,7 @@ class ClientHandler(threading.Thread):
         else:
             self.db.set_user_active(username, True)
 
-        # Set authenticated
+        # Set telah terotentikasi
         self.username = username
         self.is_authenticated = True
         self.server.register_user(username, self)
@@ -185,7 +185,7 @@ class ClientHandler(threading.Thread):
 
         room_name = packet.get("room_name", "").strip()
         
-        # Validate room name
+        # Validate nama room 
         from utils import validate_room_name
         is_valid, error_msg = validate_room_name(room_name)
         
@@ -201,7 +201,7 @@ class ClientHandler(threading.Thread):
         success, message, room = self.room_manager.create_room(room_name, self.username)
         
         if success:
-            # Auto-join creator to room
+            # Auto-join creator ke room
             self.room_manager.join_room(room_name, self.username, self)
             self.current_room = room_name
 
@@ -224,10 +224,10 @@ class ClientHandler(threading.Thread):
         if success:
             self.current_room = room_name
             
-            # Get chat history
+            # Get history chat 
             history = self.db.get_room_history(room_name)
             
-            # Get room info
+            # Get info tentang room
             room_info = self.room_manager.get_room_info(room_name)
             
             response = create_packet(PacketType.JOIN_ROOM_RESPONSE, {
@@ -277,7 +277,7 @@ class ClientHandler(threading.Thread):
         if not room_name or not message:
             return
 
-        # Verify user is in the room
+        # Pastikan (verify) bahwa user sudah di dalam room
         if self.current_room != room_name:
             error_packet = create_packet(PacketType.ERROR, {
                 "message": "You are not in this room"
@@ -285,10 +285,10 @@ class ClientHandler(threading.Thread):
             self.send_packet(error_packet)
             return
 
-        # Save to database
+        # Simpan ke database
         self.db.save_message(room_name, self.username, message, message_type)
 
-        # Broadcast to room
+        # Broadcast ke room
         broadcast_packet = create_packet(PacketType.MESSAGE, {
             "room": room_name,
             "sender": self.username,
@@ -307,7 +307,7 @@ class ClientHandler(threading.Thread):
         if room_name and self.current_room == room_name:
             self.room_manager.set_user_typing(room_name, self.username, True)
             
-            # Broadcast typing status
+            # Satus typing broadcast 
             typing_packet = create_packet(PacketType.TYPING, {
                 "room": room_name,
                 "username": self.username,
@@ -326,7 +326,6 @@ class ClientHandler(threading.Thread):
         if room_name and self.current_room == room_name:
             self.room_manager.set_user_typing(room_name, self.username, False)
             
-            # Broadcast typing status
             typing_packet = create_packet(PacketType.TYPING_STOP, {
                 "room": room_name,
                 "username": self.username,
@@ -391,7 +390,7 @@ class ClientHandler(threading.Thread):
 
         room_name = packet.get("room")
         
-        # Verify ownership
+        # Verify kepemilikan
         if not self.room_manager.is_room_owner(room_name, self.username):
             error_packet = create_packet(PacketType.ERROR, {
                 "message": "Only room owner can close the room"
@@ -416,7 +415,7 @@ class ClientHandler(threading.Thread):
 
         room_name = packet.get("room")
         
-        # Verify ownership
+        # Verify kepemilikan pt2
         if not self.room_manager.is_room_owner(room_name, self.username):
             error_packet = create_packet(PacketType.ERROR, {
                 "message": "Only room owner can delete the room"
@@ -447,7 +446,7 @@ class ClientHandler(threading.Thread):
         if not room_name or not file_name:
             return
 
-        # Validate file size
+        # Validasi ukuran file
         if file_size > MAX_FILE_SIZE:
             error_packet = create_packet(PacketType.ERROR, {
                 "message": f"File too large. Maximum size is {MAX_FILE_SIZE // (1024*1024)}MB"
@@ -455,7 +454,7 @@ class ClientHandler(threading.Thread):
             self.send_packet(error_packet)
             return
 
-        # Broadcast file offer to room
+        # Broadcast file offer ke room
         offer_packet = create_packet(PacketType.FILE_OFFER, {
             "room": room_name,
             "sender": self.username,
@@ -478,12 +477,12 @@ class ClientHandler(threading.Thread):
         if not room_name or not file_name or not file_data:
             return
 
-        # Save file
+        # SImpan file
         try:
             import base64
             file_bytes = base64.b64decode(file_data)
             
-            # Generate unique filename
+            # Generate filename unik
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
             unique_filename = f"{timestamp}_{file_name}"
             file_path = os.path.join(self.file_transfer_dir, unique_filename)
@@ -491,13 +490,13 @@ class ClientHandler(threading.Thread):
             with open(file_path, 'wb') as f:
                 f.write(file_bytes)
 
-            # Save reference to database
+            # Simpan referensi ke database
             self.db.save_message(
                 room_name, self.username, f"[File: {file_name}]",
                 message_type="file", file_path=file_path
             )
 
-            # Broadcast file to room
+            # Broadcast file ke room
             broadcast_packet = create_packet(PacketType.FILE, {
                 "room": room_name,
                 "sender": self.username,
@@ -546,13 +545,13 @@ class ClientHandler(threading.Thread):
         log_event("CLIENT", f"Cleaning up client {self.username or self.address}")
         
         if self.username:
-            # Handle room leave
+            # User ingin meninggalkan (memutus koneksi) dari room
             self.room_manager.handle_user_disconnect(self.username)
             
-            # Unregister from server
+            # Un-register dari server
             self.server.unregister_user(self.username)
         
-        # Close socket
+        # Tutup socket
         try:
             self.client_socket.close()
         except:
