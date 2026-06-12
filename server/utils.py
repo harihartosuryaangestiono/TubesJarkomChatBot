@@ -1,6 +1,6 @@
 """
-Utility functions and constants for the chat server.
-Contains packet types, helper functions, and logging utilities.
+Function-function utility dan constant untuk server chat 
+Mengandung tipe paket, helper functions, dan keperluan logging
 """
 
 import json
@@ -9,7 +9,7 @@ from datetime import datetime
 from enum import Enum
 from typing import Dict, Any, Optional
 
-# Configure logging
+# Konfigurasi logging
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 
 
 class PacketType(Enum):
-    """Packet types for client-server communication."""
+    """Tipe-tipe paket untuk komunikasi client-server"""
     LOGIN = "login"
     LOGIN_RESPONSE = "login_response"
     CREATE_ROOM = "create_room"
@@ -52,7 +52,6 @@ class PacketType(Enum):
 
 
 class NotificationType(Enum):
-    """Types of system notifications."""
     USER_JOINED = "user_joined"
     USER_LEFT = "user_left"
     USER_KICKED = "user_kicked"
@@ -66,16 +65,13 @@ def create_packet(
     data: Dict[str, Any],
     timestamp: Optional[str] = None
 ) -> Dict[str, Any]:
-    """
-    Create a standardized packet.
+    """    
+    Catatan:
+        packet_type: Jenis paket
+        data: Paket data/payload
+        timestamp: (opsional) timestamp -> auto-generated jika tidak diberikan
     
-    Args:
-        packet_type: Type of the packet
-        data: Packet data/payload
-        timestamp: Optional timestamp (auto-generated if not provided)
-    
-    Returns:
-        Dictionary representing the packet
+    Return: Dictionary yang merepresentasikan paket
     """
     return {
         "type": packet_type.value if isinstance(packet_type, PacketType) else packet_type,
@@ -86,26 +82,16 @@ def create_packet(
 
 def encode_packet(packet: Dict[str, Any]) -> bytes:
     """
-    Encode a packet to bytes for transmission.
-    
-    Args:
-        packet: Dictionary packet to encode
-    
-    Returns:
-        Encoded bytes
+    Encode sebuah packet menjadi bytes untuk transmisi
+    packet: Dictionary packet
     """
     return json.dumps(packet).encode('utf-8')
 
 
 def decode_packet(data: bytes) -> Optional[Dict[str, Any]]:
     """
-    Decode bytes to a packet dictionary.
-    
-    Args:
-        data: Bytes to decode
-    
-    Returns:
-        Decoded packet dictionary or None if decoding fails
+    Decode bytes ke packet dictionary.
+    Return: hasil decode packet dictionary --> jika gagal tidak return apa-apa
     """
     try:
         return json.loads(data.decode('utf-8'))
@@ -115,12 +101,12 @@ def decode_packet(data: bytes) -> Optional[Dict[str, Any]]:
 
 
 def get_current_timestamp() -> str:
-    """Get current timestamp in ISO format."""
+    """Get timestamp current (ISO format)"""
     return datetime.now().isoformat()
 
 
 def format_timestamp(iso_timestamp: str) -> str:
-    """Format ISO timestamp to human-readable format."""
+    """Format ISO timestamp ke human-readable format"""
     try:
         dt = datetime.fromisoformat(iso_timestamp)
         return dt.strftime("%H:%M:%S")
@@ -129,7 +115,6 @@ def format_timestamp(iso_timestamp: str) -> str:
 
 
 def log_event(event_type: str, details: str, level: str = "info"):
-    """Log server events."""
     log_message = f"[{event_type}] {details}"
     if level == "info":
         logger.info(log_message)
@@ -141,13 +126,13 @@ def log_event(event_type: str, details: str, level: str = "info"):
         logger.debug(log_message)
 
 
-# Server configuration
+# Konfigurasi server 
 DEFAULT_HOST = "0.0.0.0"
 DEFAULT_PORT = 5000
 BUFFER_SIZE = 4096
 MAX_CONNECTIONS = 100
 
-# File transfer settings
+# Setting file transfer
 FILE_CHUNK_SIZE = 8192
 MAX_FILE_SIZE = 50 * 1024 * 1024  # 50 MB
 ALLOWED_FILE_TYPES = {
@@ -159,47 +144,30 @@ ALLOWED_FILE_TYPES = {
 
 
 def validate_username(username: str) -> tuple[bool, str]:
-    """
-    Validate username format.
-    
-    Args:
-        username: Username to validate
-    
-    Returns:
-        Tuple of (is_valid, error_message)
-    """
     if not username:
-        return False, "Username cannot be empty"
+        return False, "Username tidak boleh kosong"
     
     if len(username) < 3:
-        return False, "Username must be at least 3 characters"
+        return False, "Username >= 3 characters"
     
     if len(username) > 20:
-        return False, "Username must be at most 20 characters"
+        return False, "Username <= 20 characters"
     
     if not username.isalnum() and not all(c.isalnum() or c == '_' for c in username):
-        return False, "Username can only contain letters, numbers, and underscores"
+        return False, "Username hanya dapat mengandung huruf, angka, underscore"
     
     return True, ""
 
 
 def validate_room_name(room_name: str) -> tuple[bool, str]:
-    """
-    Validate room name format.
-    
-    Args:
-        room_name: Room name to validate
-    
-    Returns:
-        Tuple of (is_valid, error_message)
-    """
+    """Memastikan format nama Room sudah valid """
     if not room_name:
-        return False, "Room name cannot be empty"
+        return False, "Room name tidak boleh kosong"
     
     if len(room_name) < 2:
-        return False, "Room name must be at least 2 characters"
+        return False, "Room name >= 2 characters"
     
     if len(room_name) > 30:
-        return False, "Room name must be at most 30 characters"
+        return False, "Room name <= 30 characters"
     
     return True, ""
