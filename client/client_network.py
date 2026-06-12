@@ -1,6 +1,6 @@
 """
-Network client module for the chat application.
-Handles socket connection and communication with the server.
+Network client module untuk chat application
+Menangani socket connection dan komunikasi dengan server
 """
 
 import socket
@@ -15,8 +15,8 @@ from PyQt5.QtCore import QObject, pyqtSignal
 
 class ChatClient(QObject):
     """
-    Network client for chat server communication.
-    Uses Qt signals for GUI integration.
+    Network client untuk komunikasi chat server 
+    Menggunakan Qt signals untuk integrasi GUI 
     """
     
     # Sinyal untuk update GUI 
@@ -38,7 +38,7 @@ class ChatClient(QObject):
     
     def __init__(self, host: str = "127.0.0.1", port: int = 5000):
         """
-        Initialize chat client.
+        Inisialisasi chat client
         
         Args:
             host: Server host address
@@ -54,7 +54,7 @@ class ChatClient(QObject):
         self.lock = threading.Lock()
     
     def connect_to_server(self) -> bool:
-        """Connect to the chat server."""
+        """Connect chat server"""
         try:
             self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self.socket.connect((self.host, self.port))
@@ -72,7 +72,7 @@ class ChatClient(QObject):
             return False
     
     def disconnect(self):
-        """Disconnect from server."""
+        """Disconnect dari server"""
         self.is_connected = False
         
         if self.socket:
@@ -90,7 +90,7 @@ class ChatClient(QObject):
         self.disconnected.emit("Disconnected from server")
     
     def login(self, username: str):
-        """Send login request."""
+        """Kirim login request"""
         self.username = username
         self._send_packet({
             "type": "login",
@@ -99,7 +99,7 @@ class ChatClient(QObject):
         })
     
     def create_room(self, room_name: str):
-        """Send create room request."""
+        """Kirim create room request"""
         self._send_packet({
             "type": "create_room",
             "room_name": room_name,
@@ -107,7 +107,7 @@ class ChatClient(QObject):
         })
     
     def join_room(self, room_name: str):
-        """Send join room request."""
+        """Kiriim join room request"""
         self._send_packet({
             "type": "join_room",
             "room_name": room_name,
@@ -115,7 +115,7 @@ class ChatClient(QObject):
         })
     
     def leave_room(self, room_name: str):
-        """Send leave room request."""
+        """Kirim leave room request"""
         self._send_packet({
             "type": "leave_room",
             "room_name": room_name,
@@ -123,7 +123,7 @@ class ChatClient(QObject):
         })
     
     def send_message(self, room: str, message: str, message_type: str = "text"):
-        """Send a chat message."""
+        """Kirim a chat message"""
         self._send_packet({
             "type": "message",
             "room": room,
@@ -133,7 +133,7 @@ class ChatClient(QObject):
         })
     
     def send_typing(self, room: str):
-        """Send typing indicator."""
+        """Kirim typing indicator"""
         self._send_packet({
             "type": "typing",
             "room": room,
@@ -141,7 +141,7 @@ class ChatClient(QObject):
         })
     
     def stop_typing(self, room: str):
-        """Send stop typing indicator."""
+        """Kirim stop typing indicator"""
         self._send_packet({
             "type": "typing_stop",
             "room": room,
@@ -149,14 +149,14 @@ class ChatClient(QObject):
         })
     
     def request_room_list(self):
-        """Request list of available rooms."""
+        """Request list ruangan tersedia"""
         self._send_packet({
             "type": "room_list",
             "timestamp": datetime.now().isoformat()
         })
     
     def request_user_list(self, room: str):
-        """Request list of users in a room."""
+        """Request list user dalam room"""
         self._send_packet({
             "type": "user_list",
             "room": room,
@@ -164,7 +164,7 @@ class ChatClient(QObject):
         })
     
     def kick_user(self, room: str, target_username: str):
-        """Kick a user from room."""
+        """Kick user dari room"""
         self._send_packet({
             "type": "kick_user",
             "room": room,
@@ -173,7 +173,7 @@ class ChatClient(QObject):
         })
     
     def close_room(self, room: str):
-        """Close a room."""
+        """Tutup room"""
         self._send_packet({
             "type": "close_room",
             "room": room,
@@ -181,7 +181,7 @@ class ChatClient(QObject):
         })
     
     def delete_room(self, room: str):
-        """Delete a room."""
+        """Hapus room"""
         self._send_packet({
             "type": "delete_room",
             "room": room,
@@ -189,7 +189,7 @@ class ChatClient(QObject):
         })
     
     def send_file_offer(self, room: str, file_name: str, file_size: int, file_type: str):
-        """Offer a file for transfer."""
+        """Offer file untuk transfer"""
         self._send_packet({
             "type": "file_offer",
             "room": room,
@@ -200,7 +200,7 @@ class ChatClient(QObject):
         })
     
     def send_file(self, room: str, file_name: str, file_data: bytes, file_type: str):
-        """Send a file to the room."""
+        """Kirim file ke room"""
         # Encode file data menuju base64
         encoded_data = base64.b64encode(file_data).decode('utf-8')
         
@@ -214,7 +214,7 @@ class ChatClient(QObject):
         })
     
     def _send_packet(self, packet: Dict[str, Any]):
-        """Send a packet to the server."""
+        """Kirim packet ke server"""
         with self.lock:
             if self.socket and self.is_connected:
                 try:
@@ -225,7 +225,7 @@ class ChatClient(QObject):
                     self.is_connected = False
     
     def _receive_loop(self):
-        """Main receive loop running in separate thread."""
+        """Main menerima loop running di thread terpisah"""
         while self.is_connected:
             try:
                 data = self.socket.recv(4096)
@@ -249,7 +249,7 @@ class ChatClient(QObject):
         self.disconnected.emit("Connection lost")
     
     def _process_packet(self, packet: Dict[str, Any]):
-        """Process received packet."""
+        """Process menerima packet"""
         packet_type = packet.get("type")
         
         if packet_type == "login_response":
