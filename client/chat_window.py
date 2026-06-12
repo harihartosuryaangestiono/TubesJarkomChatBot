@@ -34,7 +34,7 @@ class EmojiPicker(QDialog):
         layout = QVBoxLayout(self)
         layout.setSpacing(10)
         
-        # Grid for emojis
+        # Grid untuk emojis
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
         scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
@@ -72,7 +72,7 @@ class MessageBubble(QFrame):
         self.setup_ui(sender, message, timestamp)
     
     def setup_ui(self, sender: str, message: str, timestamp: str):
-        # Set style based on sender
+        # Set style berdasarkan sender
         if self.is_own:
             self.setStyleSheet(f"""
                 QFrame {{
@@ -94,7 +94,7 @@ class MessageBubble(QFrame):
         layout.setContentsMargins(12, 8, 12, 8)
         layout.setSpacing(4)
         
-        # Sender name (only for others)
+        # Nama sender (hanya untuk user selain sender)
         if not self.is_own:
             sender_label = QLabel(sender)
             sender_label.setStyleSheet(f"""
@@ -197,12 +197,12 @@ class ChatWindow(QMainWindow):
         central = QWidget()
         self.setCentralWidget(central)
         
-        # Main layout
+        # Layout utama
         main_layout = QHBoxLayout(central)
         main_layout.setContentsMargins(0, 0, 0, 0)
         main_layout.setSpacing(0)
         
-        # Chat area
+        # Area chat
         chat_area = QWidget()
         chat_area.setObjectName("chat_area")
         chat_layout = QVBoxLayout(chat_area)
@@ -237,7 +237,7 @@ class ChatWindow(QMainWindow):
         header_layout.addLayout(room_info)
         header_layout.addStretch()
         
-        # Owner controls
+        # Kontrol pemilik
         if self.is_owner:
             owner_menu = QPushButton("⚙ Owner Controls")
             owner_menu.setObjectName("secondary")
@@ -254,7 +254,7 @@ class ChatWindow(QMainWindow):
                 }}
             """)
             
-            # Create menu
+            # Menu create 
             menu = QMenu(self)
             menu.setStyleSheet(f"""
                 QMenu {{
@@ -278,7 +278,7 @@ class ChatWindow(QMainWindow):
             owner_menu.setMenu(menu)
             header_layout.addWidget(owner_menu)
         
-        # Leave button
+        # Tombol leave
         leave_btn = QPushButton("Leave Room")
         leave_btn.setObjectName("secondary")
         leave_btn.setStyleSheet(f"""
@@ -298,7 +298,7 @@ class ChatWindow(QMainWindow):
         
         chat_layout.addWidget(header)
         
-        # Messages scroll area
+        # Area messages scroll 
         self.messages_scroll = QScrollArea()
         self.messages_scroll.setWidgetResizable(True)
         self.messages_scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
@@ -333,7 +333,7 @@ class ChatWindow(QMainWindow):
         input_layout.setContentsMargins(20, 15, 20, 15)
         input_layout.setSpacing(10)
         
-        # Emoji button
+        # Tombol emoji 
         emoji_btn = QPushButton("😊")
         emoji_btn.setObjectName("emoji_btn")
         emoji_btn.setFixedSize(40, 40)
@@ -357,7 +357,7 @@ class ChatWindow(QMainWindow):
         self.message_input.textChanged.connect(self.on_typing)
         input_layout.addWidget(self.message_input, stretch=1)
         
-        # Send button
+        # Tombol send 
         send_btn = QPushButton("Send")
         send_btn.setObjectName("send_btn")
         send_btn.setFixedWidth(80)
@@ -368,7 +368,7 @@ class ChatWindow(QMainWindow):
         chat_layout.addWidget(input_area)
         main_layout.addWidget(chat_area, stretch=1)
         
-        # Sidebar (user list)
+        # Sidebar (list user)
         sidebar = QWidget()
         sidebar.setObjectName("sidebar")
         sidebar.setFixedWidth(220)
@@ -376,7 +376,7 @@ class ChatWindow(QMainWindow):
         sidebar_layout.setContentsMargins(15, 20, 15, 20)
         sidebar_layout.setSpacing(15)
         
-        # User list header
+        # Header user list 
         users_header = QLabel("MEMBERS")
         users_header.setStyleSheet(f"""
             color: {COLORS['text_muted']};
@@ -419,7 +419,7 @@ class ChatWindow(QMainWindow):
         """Add a message bubble to the chat."""
         bubble = MessageBubble(sender, message, timestamp, is_own)
         
-        # Create layout for alignment
+        # Create layout untuk penyelarasan 
         bubble_layout = QHBoxLayout()
         if is_own:
             bubble_layout.addStretch()
@@ -428,12 +428,12 @@ class ChatWindow(QMainWindow):
             bubble_layout.addWidget(bubble)
             bubble_layout.addStretch()
         
-        # Add to messages layout (before the stretch at the end)
+        # Tambahkan ke tata letak pesan (sebelum bagian spacer di akhir)
         self.messages_layout.insertLayout(
             self.messages_layout.count() - 1, bubble_layout
         )
         
-        # Scroll to bottom
+        # Scroll ke paling bawah
         QTimer.singleShot(100, self.scroll_to_bottom)
     
     def add_system_message(self, message: str):
@@ -467,7 +467,7 @@ class ChatWindow(QMainWindow):
         """Handle typing in input field."""
         if self.message_input.text():
             self.client.send_typing(self.room_name)
-            self.typing_timer.start(3000)  # Stop typing after 3 seconds
+            self.typing_timer.start(3000)  # Berhenti mengetik setelah 3 detik
     
     def stop_typing(self):
         """Send stop typing indicator."""
@@ -493,19 +493,19 @@ class ChatWindow(QMainWindow):
         
         if file_path:
             try:
-                # Check file size
+                # Cek ukuran file
                 size = os.path.getsize(file_path)
-                if size > 50 * 1024 * 1024:  # 50MB limit
+                if size > 50 * 1024 * 1024:  # limit 50MB 
                     QMessageBox.warning(self, "File Too Large", "File must be smaller than 50MB")
                     return
                 
-                # Read and send file
+                # Baca dan kirim file
                 with open(file_path, 'rb') as f:
                     file_data = f.read()
                 
                 file_name = os.path.basename(file_path)
                 
-                # Determine file type
+                # Menentukan tipe file
                 ext = os.path.splitext(file_name)[1].lower()
                 if ext in ['.jpg', '.jpeg', '.png', '.gif', '.bmp']:
                     file_type = "image"
@@ -514,10 +514,10 @@ class ChatWindow(QMainWindow):
                 else:
                     file_type = "file"
                 
-                # Send file offer first
+                # Kirim permintaan/penawaran pengiriman file terlebih dahulu
                 self.client.send_file_offer(self.room_name, file_name, size, file_type)
                 
-                # Send actual file
+                # Kirim file sebenarnya
                 self.client.send_file(self.room_name, file_name, file_data, file_type)
                 
             except Exception as e:
@@ -658,25 +658,25 @@ class ChatWindow(QMainWindow):
         if room == self.room_name or notif_type in ["user_joined", "user_left", "user_kicked"]:
             self.add_system_message(message)
             
-            # Refresh user list
+            # Refresh list user
             self.client.request_user_list(self.room_name)
     
     def on_file_received(self, room: str, sender: str, file_name: str, file_type: str, file_data: str):
         """Handle received file."""
         if room == self.room_name:
             if file_type == "image":
-                # Display image
+                # Tampilkan image
                 try:
                     image_data = base64.b64decode(file_data)
                     image = QImage()
                     image.loadFromData(image_data)
                     pixmap = QPixmap.fromImage(image)
                     
-                    # Scale if too large
+                    # Ubah ukuran jika terlalu besar
                     if pixmap.width() > 400:
                         pixmap = pixmap.scaledToWidth(400, Qt.SmoothTransformation)
                     
-                    # Create label with image
+                    # Membuat label dengan gambar
                     img_label = QLabel()
                     img_label.setPixmap(pixmap)
                     
@@ -720,13 +720,13 @@ class ChatWindow(QMainWindow):
     
     def on_error(self, message: str):
         """Handle error."""
-        # Only show critical errors
+        # Hanya menampilkan error yang kritis
         if "kick" in message.lower() or "close" in message.lower():
             QMessageBox.critical(self, "Error", message)
     
     def closeEvent(self, event):
         """Handle window close."""
-        # Don't disconnect, just leave room
+        # Jangan putuskan koneksi, cukup keluar dari ruangan
         self.client.leave_room(self.room_name)
         self.back_to_lobby.emit()
         event.accept()
