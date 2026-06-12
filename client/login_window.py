@@ -42,7 +42,7 @@ class LoginWindow(QDialog):
         layout.setContentsMargins(40, 40, 40, 40)
         layout.setSpacing(20)
         
-        # Spacer at top
+        # Spacer di atas
         layout.addSpacerItem(QSpacerItem(
             20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding
         ))
@@ -128,13 +128,13 @@ class LoginWindow(QDialog):
             20, 20, QSizePolicy.Minimum, QSizePolicy.Fixed
         ))
         
-        # Connect button
+        # Tombol onnect 
         self.connect_btn = QPushButton("Connect & Login")
         self.connect_btn.setCursor(Qt.PointingHandCursor)
         self.connect_btn.setMinimumHeight(45)
         layout.addWidget(self.connect_btn)
         
-        # Loading label (hidden initially)
+        # Label loading (awalnya hidden)
         self.loading_label = QLabel("Connecting to server...")
         self.loading_label.setAlignment(Qt.AlignCenter)
         self.loading_label.setStyleSheet(f"color: {COLORS['accent']}; font-size: 14px;")
@@ -181,7 +181,7 @@ class LoginWindow(QDialog):
         
         username = self.username_input.text().strip()
         
-        # Validate username
+        # Validasi username
         if not username:
             self.show_error("Please enter a username")
             return
@@ -202,13 +202,13 @@ class LoginWindow(QDialog):
         self.client.host = host
         self.client.port = port
         
-        # Show loading
+        # Tampilkan loading
         self.attempting_login = True
         self.set_controls_enabled(False)
         self.loading_label.setText("Connecting to server...")
         self.loading_label.show()
         
-        # Try to connect
+        # Coba untuk connect
         if not self.client.connect_to_server():
             self.attempting_login = False
             self.set_controls_enabled(True)
@@ -229,7 +229,7 @@ class LoginWindow(QDialog):
         """Handle successful connection."""
         self.loading_label.setText("Connected! Logging in...")
         
-        # Send login request
+        # Kirim login request
         QTimer.singleShot(500, lambda: self.client.login(
             self.username_input.text().strip()
         ))
@@ -249,10 +249,10 @@ class LoginWindow(QDialog):
             self.loading_label.setText("Login successful!")
             self.client.username = username
             
-            # IMPORTANT: Set attempting_login to False so closeEvent doesn't disconnect
+            # IMPORTANT: Set attempting_login ke False agar closeEvent tidak disconnect
             self.attempting_login = False
             
-            # Close dialog with success
+            # Tutup dialog dengan sukses
             QTimer.singleShot(500, self.accept)
         else:
             self.attempting_login = False
