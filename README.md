@@ -6,26 +6,24 @@ Aplikasi desktop chatting multi-user berbasis room/chat room dengan arsitektur c
 ![PyQt5](https://img.shields.io/badge/PyQt5-5.15+-green.svg)
 ![License](https://img.shields.io/badge/License-MIT-yellow.svg)
 
-## Fitur Utama
+-- Fitur Utama --
+Login User — Setiap user masuk pakai username unik, jadi nggak ada yang namanya sama
+Lobby — Halaman utama yang nampilkan semua room yang lagi aktif
+Buat Room — Siapapun bisa buat room baru, dan yang buat otomatis jadi admin
+Chat Multi-User — Banyak user bisa masuk ke room yang sama dan ngobrol secara realtime
+Daftar User — Bisa lihat siapa aja yang lagi online di room, plus ada notifikasi kalau ada yang masuk atau keluar
+UI Chat — Pesan ditampilkan dalam bentuk bubble dengan timestamp, dan otomatis scroll ke bawah
+Keluar Room — Bisa keluar dari room kapan aja, dan user lain bakal dapat notifikasinya
+Kontrol Admin — Yang punya room bisa kick user, tutup room, atau hapus room
 
-### Fitur 
-- **Login User** - Sistem autentikasi dengan username unik
-- **Lobby sistem** - Halaman utama menampilkan daftar room
-- **Create Room** - Membuat room baru dengan pemilik sebagai admin
-- **Multiple Chat Rooms** - Beberapa user dalam satu room, pesan realtime
-- **User List** - Daftar user aktif dengan notifikasi join/leave
-- **Chat UI Modern** - Bubble chat dengan timestamp dan auto-scroll
-- **Leave Room** - Keluar dari room dengan notifikasi
-- **Owner Controls** - Kick user, tutup room, hapus room
+-- Fitur Tambahan --
+Database SQLite — Data user, room, dan riwayat chat disimpan secara persisten
+Transfer File — Bisa kirim gambar atau file langsung di dalam room
+Emoji — Ada emoji picker dengan 100+ pilihan emoji
+Dark Mode — Tema gelap modern, tampilannya mirip Discord atau Telegram
+Typing Indicator — Muncul tulisan "User is typing..." kalau ada yang lagi ngetik
 
-### Fitur Tambahan
-- **Database SQLite** - Penyimpanan user, room, dan riwayat chat
-- **File Transfer** - Kirim gambar dan file dalam room
-- **Emoji Support** - Emoji picker dengan 100+ emoji
-- **Dark Mode UI** - Tema gelap modern seperti Discord/Telegram
-- **Typing Indicator** - Menampilkan "User is typing..."
-
-## Struktur Proyek
+-- Struktur Proyek --
 
 ```
 Tubes_Jarkom/
@@ -56,47 +54,36 @@ Tubes_Jarkom/
 └── .gitignore
 ```
 
-## Cara Menjalankan
-
-### Prerequisite
+-- Cara Menjalankan -- 
+Prerequisite:
 - >= Python 3.8 
 - PyQt5
 
-### Instalasi
-
-1. **Clone atau extract project**
+Instalasi:
+1. Clone atau extract project
 ```bash
 cd Tubes_Jarkom
 ```
 
-2. **Install dependencies**
+2. Install dependencies
 ```bash
 pip install -r requirements.txt
 ```
 
-### Menjalankan Server
-
+Jalankan Server:
 ```bash
 cd server
 python server.py
 ```
 
-**Argumen opsional:**
+**Untuk ganti host atau port, bisa menggunakan argumen opsional:**
 ```bash
 python server.py --host 0.0.0.0 --port 5000
 ```
 
 Server akan berjalan pada default: `127.0.0.1:5000`. Dapat diakses dari komputer lain dalam jaringan yang sama
 
-### Menjalankan Client
-
-**Client 1:**
-```bash
-cd client
-python client.py
-```
-
-**Client 2 (komputer lain dalam jaringan):**
+Menjalankan Client
 ```bash
 cd client
 python client.py --host 192.168.1.x --port 5000
@@ -104,9 +91,8 @@ python client.py --host 192.168.1.x --port 5000
 
 *(Ganti `192.168.1.x` dengan IP address server)*
 
-## Alur Komunikasi Socket
-
-### Arsitektur Client-Server
+-- Alur Komunikasi Socket --
+Arsitektur Client-Server
 
 ```
 ┌─────────────────┐         TCP Socket         ┌─────────────────┐
@@ -121,9 +107,8 @@ python client.py --host 192.168.1.x --port 5000
 └─────────────────┘                            └─────────────────┘
 ```
 
-### Format Paket JSON
-
-Setiap komunikasi menggunakan format JSON:
+Format Paket JSON
+Semua komunikasi antara client dan server menggunakan format JSON, contohnya:
 
 ```json
 {
@@ -135,8 +120,7 @@ Setiap komunikasi menggunakan format JSON:
 }
 ```
 
-### Jenis Paket
-
+Jenis Paket
 | Paket | Deskripsi |
 |-------|-----------|
 | `login` | Autentikasi user |
@@ -151,30 +135,17 @@ Setiap komunikasi menggunakan format JSON:
 | `file` | Transfer file |
 | `notification` | Notifikasi sistem |
 
-## Tampilan UI
+-- Tampilan UI --
+1. Login Window
+Tampilan awal dengan dark theme. User bisa input alamat server dan username, ada validasi realtime dan loading indicator saat konek.
+2. Lobby Window
+Halaman utama setelah login. Ada sidebar navigasi, daftar room beserta info (nama, owner, jumlah member), tombol buat room baru, dan indikator status koneksi.
+3. Chat Window
+Tampilan ruang chat utama. Ada panel chat dengan bubble message, sidebar daftar user yang ada di room, area input lengkap dengan emoji picker dan tombol upload file, typing indicator, dan menu khusus buat owner room.
 
-### 1. Login Window
-- Modern dark theme
-- Input server address dan username
-- Validasi realtime
-- Loading indicator
+-- Skema DB --
 
-### 2. Lobby Window
-- Sidebar navigasi
-- List room dengan info (nama, owner, jumlah member)
-- Tombol create room dan refresh
-- Status koneksi
-
-### 3. Chat Window
-- Panel chat dengan bubble messages
-- Sidebar daftar user
-- Input area dengan emoji picker dan file upload
-- Typing indicator
-- Owner controls menu
-
-## Skema DB
-
-### Tabel User
+Tabel User
 ```sql
 CREATE TABLE users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -185,7 +156,7 @@ CREATE TABLE users (
 );
 ```
 
-### Tabel Rooms
+Tabel Rooms
 ```sql
 CREATE TABLE rooms (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -197,7 +168,7 @@ CREATE TABLE rooms (
 );
 ```
 
-### Tabel Chat History
+Tabel Chat History
 ```sql
 CREATE TABLE chat_history (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -210,24 +181,24 @@ CREATE TABLE chat_history (
 );
 ```
 
-## Troubleshooting
+-- Troubleshooting --
 
-### JIKA server tidak bisa diakses dari komputer lain
-1. Pastikan firewall mengizinkan port 5000
-2. Gunakan IP address lokal (cek dengan `ipconfig` / `ifconfig`)
-3. Jalankan server dengan `--host 0.0.0.0`
+JIKA server tidak bisa diakses dari komputer lain
+1) Pastikan firewall mengizinkan port 5000
+2) Cek IP lokal kamu dengan ipconfig (Windows) atau ifconfig (Linux/Mac)
+3) Jalankan server dengan --host 0.0.0.0 supaya bisa diakses dari luar
 
-### ModuleNotFoundError
+ModuleNotFoundError:
 ```bash
 pip install PyQt5
 ```
 
-### Database locked
+| Database locked
 - Hentikan semua client dan server
 - Hapus file `database/chat_app.db`
 - Jalankan ulang server (database akan dibuat otomatis)
 
-## Testing Checklist
+-- Fungsionalitas -- 
 
 - [x] Server bisa dijalankan
 - [x] Client bisa connect ke server
