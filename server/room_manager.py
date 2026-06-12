@@ -1,6 +1,8 @@
 """
-Room manager for the chat server.
-Handles room creation, management, and user tracking in memory.
+- Untuk server chat
+- Tujuan: 
+    - Mengurus pembuatan dan pengelolaan Room
+    - User tracking di memory
 """
 
 import threading
@@ -13,7 +15,7 @@ from utils import log_event, PacketType, create_packet, NotificationType
 
 @dataclass
 class Room:
-    """Represents a chat room."""
+    """Merepresentasikan 1 chatroom"""
     name: str
     owner: str
     created_at: datetime = field(default_factory=datetime.now)
@@ -23,19 +25,19 @@ class Room:
     lock: threading.Lock = field(default_factory=threading.Lock)
 
     def add_member(self, username: str, client_handler: 'ClientHandler'):
-        """Add a member to the room."""
+        """Tambah member ke chatroom."""
         with self.lock:
             self.members[username] = client_handler
 
     def remove_member(self, username: str):
-        """Remove a member from the room."""
+        """Remove member dari chatroom."""
         with self.lock:
             if username in self.members:
                 del self.members[username]
             self.typing_users.discard(username)
 
     def get_member_count(self) -> int:
-        """Get the number of members in the room."""
+        """Get jumlah member dalam chatroom"""
         with self.lock:
             return len(self.members)
 
@@ -45,7 +47,7 @@ class Room:
             return list(self.members.keys())
 
     def broadcast(self, packet: Dict[str, Any], exclude_username: Optional[str] = None):
-        """Broadcast a packet to all members."""
+        """Broadcast sebuah paket ke semua member"""
         with self.lock:
             for username, handler in self.members.items():
                 if username != exclude_username:
@@ -55,57 +57,46 @@ class Room:
                         log_event("ROOM", f"Failed to send to {username}: {e}", "error")
 
     def add_typing_user(self, username: str):
-        """Add user to typing set."""
+        """Tambahkan user ke typing set."""
         with self.lock:
             self.typing_users.add(username)
 
     def remove_typing_user(self, username: str):
-        """Remove user from typing set."""
+        """Remove user dari typing set."""
         with self.lock:
             self.typing_users.discard(username)
 
     def get_typing_users(self) -> List[str]:
-        """Get list of users currently typing."""
+        """Get list user" yang sedang mengetik."""
         with self.lock:
             return list(self.typing_users)
 
 
 class RoomManager:
-    """Manages all chat rooms in memory."""
+    """Mengurus semua chat room di memory."""
 
     def __init__(self, database_manager):
-        """
-        Initialize room manager.
-        
-        Args:
-            database_manager: DatabaseManager instance for persistence
-        """
         self.db = database_manager
         self.rooms: Dict[str, Room] = {}
         self.lock = threading.Lock()
-        self.user_current_room: Dict[str, str] = {}  # Track which room each user is in
+        self.user_current_room: Dict[str, str] = {}  # Setiap user ada di room mana
 
     def create_room(self, room_name: str, owner: str) -> tuple[bool, str, Optional[Room]]:
         """
-        Create a new room.
-        
-        Args:
-            room_name: Name of the room
-            owner: Username of the room owner
-        
-        Returns:
-            Tuple of (success, message, room_object)
+        Catatan:
+            room_name: Nama pemilik Room
+            owner: Username pemilik Room
         """
         with self.lock:
             if room_name in self.rooms:
                 return False, "Room already exists", None
 
-            # Create in database
+            # Create du database
             success, message = self.db.create_room(room_name, owner)
             if not success:
                 return False, message, None
 
-            # Create in memory
+            # Create di memori
             room = Room(name=room_name, owner=owner)
             self.rooms[room_name] = room
 
@@ -130,7 +121,7 @@ class RoomManager:
 
             room = self.rooms[room_name]
             
-            # Notify all members
+            # Kirim notifikasi ke semua member
             notification = create_packet(PacketType.NOTIFICATION, {
                 "notification_type": NotificationType.ROOM_DELETED.value,
                 "room": room_name,
@@ -138,14 +129,14 @@ class RoomManager:
             })
             room.broadcast(notification)
 
-            # Remove all members
+            # Remove semua member
             for username in list(room.members.keys()):
                 self.user_current_room.pop(username, None)
 
-            # Delete from database
+            # Hapus dari database
             self.db.delete_room(room_name)
             
-            # Remove from memory
+            # Hapus dari memory
             del self.rooms[room_name]
 
             log_event("ROOM", f"Room deleted: {room_name}")
@@ -160,7 +151,7 @@ class RoomManager:
             room = self.rooms[room_name]
             room.is_closed = True
 
-            # Notify all members
+            # Kirim notif ke semua member
             notification = create_packet(PacketType.NOTIFICATION, {
                 "notification_type": NotificationType.ROOM_CLOSED.value,
                 "room": room_name,
@@ -168,7 +159,7 @@ class RoomManager:
             })
             room.broadcast(notification)
 
-            # Remove all members
+            # Remove semua member
             members_list = list(room.members.keys())
             for username in members_list:
                 room.remove_member(username)
@@ -178,7 +169,7 @@ class RoomManager:
             # Close in database
             self.db.close_room(room_name)
 
-            # Remove from active rooms
+            # Remove dari Room-room yang sedang aktif
             del self.rooms[room_name]
 
             log_event("ROOM", f"Room closed: {room_name} by {closer_username}")
@@ -191,15 +182,14 @@ class RoomManager:
         client_handler: 'ClientHandler'
     ) -> tuple[bool, str]:
         """
-        Add a user to a room.
+        Menambahkan user ke sebuah chatroom
         
-        Args:
-            room_name: Name of the room to join
-            username: Username of the joining user
-            client_handler: Client handler for the user
+        Catatan:
+            room_name: Nama chatroom
+            username: Username user
+            client_handler: Client handler untuk user
         
-        Returns:
-            Tuple of (success, message)
+        Return: Tuple of (success, message)
         """
         with self.lock:
             if room_name not in self.rooms:
@@ -213,17 +203,17 @@ class RoomManager:
             if username in room.members:
                 return False, "Already in this room"
 
-            # Leave current room if in one
+            # Kalau User sedang ada di Room, keluar dari room tersebut 
             if username in self.user_current_room:
                 current_room_name = self.user_current_room[username]
                 self._leave_room_internal(current_room_name, username)
 
-            # Add to room
+            # Add ke room yang baru
             room.add_member(username, client_handler)
             self.user_current_room[username] = room_name
             self.db.add_room_member(room_name, username)
 
-            # Notify other members
+            # Notify member2 lain
             notification = create_packet(PacketType.NOTIFICATION, {
                 "notification_type": NotificationType.USER_JOINED.value,
                 "room": room_name,
@@ -250,17 +240,17 @@ class RoomManager:
         if username not in room.members:
             return False
 
-        # Remove from room
+        # Remove dari room
         room.remove_member(username)
         self.user_current_room.pop(username, None)
         self.db.remove_room_member(room_name, username)
 
-        # Check if room is empty and not owned
+        # Pastikan room kosong dan tidak dimiliki siapa-siapa 
         if room.get_member_count() == 0 and room.owner != username:
-            # Optionally auto-delete empty rooms
+            # (opsional) auto-delete chatroom-chatroom kosong
             pass
 
-        # Notify other members
+        # Notify member lain
         notification = create_packet(PacketType.NOTIFICATION, {
             "notification_type": NotificationType.USER_LEFT.value,
             "room": room_name,
@@ -278,16 +268,13 @@ class RoomManager:
         kicker_username: str,
         target_username: str
     ) -> tuple[bool, str]:
-        """
-        Kick a user from a room.
+        """        
+        Cat:
+            room_name: Nama chatroom
+            kicker_username: Username yang melakukan kick
+            target_username: Username yang dikick
         
-        Args:
-            room_name: Name of the room
-            kicker_username: Username of the user performing the kick
-            target_username: Username of the user to kick
-        
-        Returns:
-            Tuple of (success, message)
+        Return: Tuple of (success, message)
         """
         with self.lock:
             if room_name not in self.rooms:
@@ -295,7 +282,7 @@ class RoomManager:
 
             room = self.rooms[room_name]
 
-            # Verify kicker is owner
+            # Kicker harus owner
             if room.owner != kicker_username:
                 return False, "Only room owner can kick users"
 
@@ -305,15 +292,15 @@ class RoomManager:
             if target_username == kicker_username:
                 return False, "Cannot kick yourself"
 
-            # Get target's client handler
+            # Get client handlernya target 
             target_handler = room.members.get(target_username)
 
-            # Remove from room
+            # Remove dari room
             room.remove_member(target_username)
             self.user_current_room.pop(target_username, None)
             self.db.remove_room_member(room_name, target_username, is_kicked=True)
 
-            # Notify kicked user
+            # Notify user yang dikeluarkan
             kick_notification = create_packet(PacketType.NOTIFICATION, {
                 "notification_type": NotificationType.USER_KICKED.value,
                 "room": room_name,
@@ -325,7 +312,7 @@ class RoomManager:
                 except Exception as e:
                     log_event("ROOM", f"Failed to notify kicked user: {e}", "error")
 
-            # Notify remaining members
+            # Notify member lain
             notification = create_packet(PacketType.NOTIFICATION, {
                 "notification_type": NotificationType.USER_KICKED.value,
                 "room": room_name,
@@ -338,7 +325,6 @@ class RoomManager:
             return True, f"{target_username} has been kicked"
 
     def get_room_info(self, room_name: str) -> Optional[Dict[str, Any]]:
-        """Get room information."""
         with self.lock:
             if room_name not in self.rooms:
                 return None
@@ -354,7 +340,7 @@ class RoomManager:
             }
 
     def get_all_rooms_info(self) -> List[Dict[str, Any]]:
-        """Get information about all active rooms."""
+        """Informasi semua room YANG AKTIF."""
         with self.lock:
             return [
                 {
@@ -373,7 +359,7 @@ class RoomManager:
         packet: Dict[str, Any],
         exclude_username: Optional[str] = None
     ) -> bool:
-        """Broadcast a packet to all members of a room."""
+        """Broadcast paket ke semua member sebuah Room."""
         with self.lock:
             if room_name not in self.rooms:
                 return False
@@ -383,39 +369,34 @@ class RoomManager:
             return True
 
     def get_user_room(self, username: str) -> Optional[str]:
-        """Get the room name a user is currently in."""
         with self.lock:
             return self.user_current_room.get(username)
 
     def is_room_owner(self, room_name: str, username: str) -> bool:
-        """Check if a user is the owner of a room."""
         with self.lock:
             if room_name not in self.rooms:
                 return False
             return self.rooms[room_name].owner == username
 
     def handle_user_disconnect(self, username: str):
-        """Handle user disconnection."""
         with self.lock:
-            # Leave current room if in one
+            # Jika user sedang berada di chatroom, keluarkan
             if username in self.user_current_room:
                 room_name = self.user_current_room[username]
                 self._leave_room_internal(room_name, username)
 
-            # Mark user as inactive in database
+            # Tandai user sebagai non-aktif in database
             self.db.set_user_active(username, False)
 
         log_event("ROOM", f"User disconnected: {username}")
 
     def get_typing_users(self, room_name: str) -> List[str]:
-        """Get list of users typing in a room."""
         with self.lock:
             if room_name not in self.rooms:
                 return []
             return self.rooms[room_name].get_typing_users()
 
     def set_user_typing(self, room_name: str, username: str, is_typing: bool):
-        """Set typing status for a user."""
         with self.lock:
             if room_name not in self.rooms:
                 return
