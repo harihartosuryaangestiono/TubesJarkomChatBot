@@ -31,11 +31,11 @@ class ChatApplication:
         self.current_window = None
         self.chat_window = None
         
-        # Set application-wide font
+        # Set font dalam aplikasi
         font = QFont("Segoe UI", 10)
         self.app.setFont(font)
         
-        # Set application style
+        # Set style aplikasi
         self.app.setStyle('Fusion')
     
     def run(self):
@@ -48,18 +48,18 @@ class ChatApplication:
         self.current_window = LoginWindow(self.client)
         self.current_window.show()
         
-        # Connect to lobby on successful login
+        # Hubungkan ke lobby setelah login berhasil
         self.client.login_response.connect(self.on_login_success)
     
     def on_login_success(self, success: bool, message: str, username: str):
         """Handle successful login."""
         if success:
-            # Close login window
+            # Tutup login window
             if self.current_window:
                 self.current_window.close()
                 self.current_window = None
             
-            # Show lobby
+            # Tampilkan lobby
             self.show_lobby()
     
     def show_lobby(self):
@@ -68,12 +68,12 @@ class ChatApplication:
         self.current_window.join_room_requested.connect(self.on_join_room)
         self.current_window.show()
         
-        # Connect room join signal
+        # Menghubungkan sinyal join room
         self.client.room_joined.connect(self.on_room_joined)
     
     def on_join_room(self, room_name: str):
         """Handle join room request from lobby."""
-        pass  # Handled by room_joined signal
+        pass  # Diatasi oleh room_joined signal
     
     def on_room_joined(
         self,
@@ -87,15 +87,15 @@ class ChatApplication:
     ):
         """Handle room join response."""
         if success:
-            # Hide lobby
+            # Sembunyikan lobby
             if self.current_window:
                 self.current_window.hide()
             
-            # Show chat window
+            # Tampilkan chat window
             self.chat_window = ChatWindow(self.client, room_name, is_owner)
             self.chat_window.back_to_lobby.connect(self.on_back_to_lobby)
             
-            # Load chat history
+            # memuat histori chat 
             for msg in history:
                 sender = msg.get("sender_username", "Unknown")
                 content = msg.get("message", "")
@@ -105,7 +105,7 @@ class ChatApplication:
                 is_own = sender == self.client.username
                 self.chat_window.add_message(sender, content, timestamp, is_own)
             
-            # Add initial system message
+            # Tambahkan pesan sistem pertama
             self.chat_window.add_system_message(f"Joined room: {room_name}")
             
             self.chat_window.show()
@@ -116,7 +116,7 @@ class ChatApplication:
             self.chat_window.close()
             self.chat_window = None
         
-        # Show lobby again
+        # Tampilkan lobby lagi
         if self.current_window:
             self.current_window.show()
             self.current_window.refresh_room_list()
@@ -141,7 +141,7 @@ def main():
     """Main entry point."""
     import argparse
     
-    # Parse command line arguments
+    # Membaca argumen dari command line
     parser = argparse.ArgumentParser(description="Multiple Chat Rooms Client")
     parser.add_argument(
         "--host",
@@ -156,13 +156,13 @@ def main():
     )
     args = parser.parse_args()
     
-    # Print client info
+    # Print info client 
     print_client_info()
     
-    # Create and run application
+    # buat dan jalankan application
     app = ChatApplication()
     
-    # Set default host/port from args
+    # Set default host/port dari args
     app.client.host = args.host
     app.client.port = args.port
     
