@@ -1,6 +1,6 @@
 """
-Lobby window for the chat client.
-Displays available rooms and allows creating/joining rooms.
+Lobby window untuk chat client.
+Menampilkan ruangan tersedia dan memperbolehkan pembuatan/join rooms.
 """
 
 import sys
@@ -17,7 +17,7 @@ from styles import get_style, COLORS
 
 
 class RoomListItem(QWidget):
-    """Custom widget for room list items."""
+    """Custom widget untuk room list items."""
     
     def __init__(self, room_name: str, owner: str, member_count: int, parent=None):
         super().__init__(parent)
@@ -256,7 +256,7 @@ class LobbyWindow(QMainWindow):
         main_layout.addWidget(content, stretch=1)
     
     def connect_signals(self):
-        """Connect signals and slots."""
+        """Connect signals dan slots."""
         # Client signals
         self.client.room_list_received.connect(self.on_room_list_received)
         self.client.room_created.connect(self.on_room_created)
@@ -264,20 +264,20 @@ class LobbyWindow(QMainWindow):
         self.client.error_occurred.connect(self.on_error)
     
     def refresh_room_list(self):
-        """Request room list from server."""
+        """Request room list dari server."""
         self.status_label.setText("Refreshing room list...")
         self.status_label.setStyleSheet(f"color: {COLORS['accent_info']};")
         self.client.request_room_list()
     
     def on_room_list_received(self, rooms):
-        """Handle room list response."""
+        """Menangani room list response."""
         self.current_rooms = rooms
         self.update_room_list()
         self.status_label.setText(f"{len(rooms)} room(s) available")
         self.status_label.setStyleSheet(f"color: {COLORS['accent_success']};")
     
     def update_room_list(self):
-        """Update the room list widget."""
+        """Update room list widget."""
         self.room_list.clear()
         
         if not self.current_rooms:
@@ -307,18 +307,18 @@ class LobbyWindow(QMainWindow):
             self.room_list.setItemWidget(item, room_widget)
     
     def on_room_selected(self, item):
-        """Handle room selection."""
+        """Menangani room selection."""
         room_name = item.data(Qt.UserRole)
         if room_name:
             self.join_room(room_name)
     
     def join_room(self, room_name: str):
-        """Join a room."""
+        """Join room."""
         self.status_label.setText(f"Joining room: {room_name}...")
         self.client.join_room(room_name)
     
     def on_create_room(self):
-        """Show create room dialog."""
+        """Tampilkan create room dialog."""
         room_name, ok = QInputDialog.getText(
             self, "Create Room", "Enter room name:",
             QLineEdit.Normal, ""
@@ -338,7 +338,7 @@ class LobbyWindow(QMainWindow):
                 self.client.create_room(room_name)
     
     def on_room_created(self, success: bool, message: str, room_name: str):
-        """Handle room creation response."""
+        """Menangani room creation response."""
         if success:
             self.status_label.setText(f"Room '{room_name}' created!")
             QMessageBox.information(self, "Success", f"Room '{room_name}' created successfully!")
@@ -347,7 +347,7 @@ class LobbyWindow(QMainWindow):
             QMessageBox.critical(self, "Error", message)
     
     def on_disconnect(self):
-        """Handle disconnect button."""
+        """Menangani disconnect button."""
         reply = QMessageBox.question(
             self, "Disconnect",
             "Are you sure you want to disconnect?",
@@ -360,17 +360,17 @@ class LobbyWindow(QMainWindow):
             self.close()
     
     def on_disconnected(self, message: str):
-        """Handle disconnection."""
+        """Menangani disconnection."""
         QMessageBox.warning(self, "Disconnected", f"Lost connection to server: {message}")
         self.close()
     
     def on_error(self, message: str):
-        """Handle error."""
+        """Menangani error."""
         self.status_label.setText(f"Error: {message}")
         self.status_label.setStyleSheet(f"color: {COLORS['accent_danger']};")
         QMessageBox.critical(self, "Error", message)
     
     def closeEvent(self, event):
-        """Handle window close."""
+        """Menangani window close."""
         self.client.disconnect()
         event.accept()
