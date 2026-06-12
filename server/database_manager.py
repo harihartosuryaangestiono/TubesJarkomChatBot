@@ -1,6 +1,6 @@
 """
-Database manager for the chat server.
-Handles all SQLite database operations for users, rooms, and chat history.
+Database manager untuk server chat server
+Tujuan: Mengurus semua operasi di SQLite database untuk user, room, dan history chat
 """
 
 import sqlite3
@@ -14,15 +14,10 @@ from utils import log_event
 
 
 class DatabaseManager:
-    """Manages SQLite database operations for the chat application."""
+    """Mengurus operasi2 pada DB SQLite yang diperuntukan aplikasi."""
     
     def __init__(self, db_path: str = "database/chat_app.db"):
-        """
-        Initialize database manager.
-        
-        Args:
-            db_path: Path to SQLite database file
-        """
+        """db_path: Path ke file database SQLite"""
         self.db_path = db_path
         self._ensure_db_directory()
         self._init_database()
@@ -48,7 +43,7 @@ class DatabaseManager:
         with self._get_connection() as conn:
             cursor = conn.cursor()
             
-            # Users table
+            # tabel User
             cursor.execute('''
                 CREATE TABLE IF NOT EXISTS users (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -59,7 +54,7 @@ class DatabaseManager:
                 )
             ''')
             
-            # Rooms table
+            # Table Room
             cursor.execute('''
                 CREATE TABLE IF NOT EXISTS rooms (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -72,7 +67,7 @@ class DatabaseManager:
                 )
             ''')
             
-            # Chat history table
+            # Tabel sejarah chat
             cursor.execute('''
                 CREATE TABLE IF NOT EXISTS chat_history (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -87,7 +82,7 @@ class DatabaseManager:
                 )
             ''')
             
-            # Room members table (tracks who joined which room)
+            # Table member Room (siapa yang join room apa)
             cursor.execute('''
                 CREATE TABLE IF NOT EXISTS room_members (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -105,7 +100,7 @@ class DatabaseManager:
             conn.commit()
             log_event("DATABASE", "Database initialized successfully")
     
-    # User operations
+    # Operasi untuk User
     def create_user(self, username: str) -> Tuple[bool, str]:
         """
         Create a new user.
@@ -168,7 +163,7 @@ class DatabaseManager:
                 return dict(row)
             return None
     
-    # Room operations
+    # Operasi untuk Room
     def create_room(self, room_name: str, owner_username: str) -> Tuple[bool, str]:
         """
         Create a new room.
@@ -265,7 +260,7 @@ class DatabaseManager:
             )
             return cursor.fetchone() is not None
     
-    # Chat history operations
+    # Operasi untuk Chat History
     def save_message(
         self,
         room_name: str,
@@ -316,7 +311,7 @@ class DatabaseManager:
             log_event("DATABASE", f"Error clearing history: {e}", "error")
             return False
     
-    # Room member operations
+    # Operasi untuk handle member2 di Room
     def add_room_member(self, room_name: str, username: str) -> bool:
         """Record a user joining a room."""
         try:
@@ -379,7 +374,7 @@ class DatabaseManager:
             rows = cursor.fetchall()
             return [row['room_name'] for row in rows]
     
-    # Statistics
+    # Data chatbot, yaitu jumlah user, jumlah chat, jumlah ruangan aktif
     def get_stats(self) -> Dict[str, Any]:
         """Get database statistics."""
         with self._get_connection() as conn:
