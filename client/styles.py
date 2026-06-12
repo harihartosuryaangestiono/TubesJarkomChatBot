@@ -1,6 +1,6 @@
 """
-Styles and themes for the chat client UI.
-Defines modern dark theme similar to Discord/Telegram.
+Styles dan themes untuk UI chat client.
+Menggunakan modern dark theme mirip dengan Discord/Telegram.
 """
 
 # Color Palette - Dark Theme
