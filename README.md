@@ -6,11 +6,11 @@ Aplikasi desktop chatting multi-user berbasis room/chat room dengan arsitektur c
 ![PyQt5](https://img.shields.io/badge/PyQt5-5.15+-green.svg)
 ![License](https://img.shields.io/badge/License-MIT-yellow.svg)
 
-## 📋 Fitur Utama
+## Fitur Utama
 
-### Core Features
+### Fitur 
 - **Login User** - Sistem autentikasi dengan username unik
-- **Lobby System** - Halaman utama menampilkan daftar room
+- **Lobby sistem** - Halaman utama menampilkan daftar room
 - **Create Room** - Membuat room baru dengan pemilik sebagai admin
 - **Multiple Chat Rooms** - Beberapa user dalam satu room, pesan realtime
 - **User List** - Daftar user aktif dengan notifikasi join/leave
@@ -25,7 +25,7 @@ Aplikasi desktop chatting multi-user berbasis room/chat room dengan arsitektur c
 - **Dark Mode UI** - Tema gelap modern seperti Discord/Telegram
 - **Typing Indicator** - Menampilkan "User is typing..."
 
-## 🏗️ Struktur Project
+## Struktur Proyek
 
 ```
 Tubes_Jarkom/
@@ -56,13 +56,13 @@ Tubes_Jarkom/
 └── .gitignore
 ```
 
-## 🚀 Cara Menjalankan
+## Cara Menjalankan
 
-### Prerequisites
-- Python 3.8 atau lebih tinggi
+### Prerequisite
+- >= Python 3.8 
 - PyQt5
 
-### Installation
+### Instalasi
 
 1. **Clone atau extract project**
 ```bash
@@ -81,14 +81,12 @@ cd server
 python server.py
 ```
 
-**Optional arguments:**
+**Argumen opsional:**
 ```bash
 python server.py --host 0.0.0.0 --port 5000
 ```
 
-Server akan berjalan pada:
-- Default: `127.0.0.1:5000`
-- Dapat diakses dari komputer lain dalam jaringan yang sama
+Server akan berjalan pada default: `127.0.0.1:5000`. Dapat diakses dari komputer lain dalam jaringan yang sama
 
 ### Menjalankan Client
 
@@ -106,7 +104,7 @@ python client.py --host 192.168.1.x --port 5000
 
 *(Ganti `192.168.1.x` dengan IP address server)*
 
-## 📡 Alur Komunikasi Socket
+## Alur Komunikasi Socket
 
 ### Arsitektur Client-Server
 
@@ -153,7 +151,7 @@ Setiap komunikasi menggunakan format JSON:
 | `file` | Transfer file |
 | `notification` | Notifikasi sistem |
 
-## 🎨 Tampilan UI
+## Tampilan UI
 
 ### 1. Login Window
 - Modern dark theme
@@ -174,9 +172,9 @@ Setiap komunikasi menggunakan format JSON:
 - Typing indicator
 - Owner controls menu
 
-## 🗄️ Database Schema
+## Skema DB
 
-### Tabel Users
+### Tabel User
 ```sql
 CREATE TABLE users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -212,9 +210,9 @@ CREATE TABLE chat_history (
 );
 ```
 
-## 🔧 Troubleshooting
+## Troubleshooting
 
-### Server tidak bisa diakses dari komputer lain
+### JIKA server tidak bisa diakses dari komputer lain
 1. Pastikan firewall mengizinkan port 5000
 2. Gunakan IP address lokal (cek dengan `ipconfig` / `ifconfig`)
 3. Jalankan server dengan `--host 0.0.0.0`
@@ -229,7 +227,7 @@ pip install PyQt5
 - Hapus file `database/chat_app.db`
 - Jalankan ulang server (database akan dibuat otomatis)
 
-## 📊 Testing Checklist
+## Testing Checklist
 
 - [x] Server bisa dijalankan
 - [x] Client bisa connect ke server
