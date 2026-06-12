@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 """
-Chat Server - Multiple Chat Rooms Application
-Main server entry point that handles client connections and manages the chat system.
+Tujuan:
+- Entry point utama ke server
+- Menghandle koneksi client
+- Menghandle sistem chat
 
-Author: Multiple Chat Rooms Team
 Version: 1.0.0
 """
 
@@ -23,37 +24,34 @@ from client_handler import ClientHandler
 
 
 class ChatServer:
-    """
-    Main chat server class.
-    
-    Handles:
-    - Client connections
+    """    
+    Mengurus:
+    - Koneksi client
     - User authentication
-    - Room management
+    - Manajemen Room
     - Message broadcasting
-    - Graceful shutdown
+    - 'Graceful shutdown'
     """
 
     def __init__(self, host: str = DEFAULT_HOST, port: int = DEFAULT_PORT):
         """
-        Initialize the chat server.
-        
-        Args:
-            host: Host address to bind to (default: 0.0.0.0)
-            port: Port number to listen on (default: 5000)
+         Menginisialisasi server        
+        Cat:
+            host: Host address di mana default 0.0.0.0
+            port: Port number di mana default 5000
         """
         self.host = host
         self.port = port
         self.server_socket: Optional[socket.socket] = None
         self.is_running = False
         
-        # Initialize database
+        # Inisialisasi database
         self.db = DatabaseManager()
         
-        # Initialize room manager
+        # Inisialisasi room manager
         self.room_manager = RoomManager(self.db)
         
-        # Track connected clients
+        # Track client2 yang terhubung
         self.clients: Dict[str, ClientHandler] = {}
         self.clients_lock = threading.Lock()
         
@@ -66,10 +64,10 @@ class ChatServer:
             self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self.server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
             
-            # Bind to address
+            # Bind ke host address
             self.server_socket.bind((self.host, self.port))
             
-            # Listen for connections
+            # Pantau/listen untuk koneksi 
             self.server_socket.listen(MAX_CONNECTIONS)
             self.is_running = True
             
@@ -80,20 +78,21 @@ class ChatServer:
             print(f"Port: {self.port}")
             print(f"{'='*50}\n")
             
-            # Setup signal handlers for graceful shutdown
+            # Setup signal handler 
+            # Dipakai untuk graceful shutdown
             signal.signal(signal.SIGINT, self._signal_handler)
             signal.signal(signal.SIGTERM, self._signal_handler)
             
-            # Accept connections loop
+            # Accept loop koneksi
             while self.is_running:
                 try:
-                    # Accept new connection
+                    # Terima koneksi baru
                     client_socket, address = self.server_socket.accept()
                     client_socket.settimeout(60)  # 60 second timeout
                     
                     log_event("SERVER", f"New connection from {address}")
                     
-                    # Create and start client handler
+                    # Create & start client handler
                     client_handler = ClientHandler(
                         client_socket=client_socket,
                         address=address,
@@ -122,7 +121,7 @@ class ChatServer:
         log_event("SERVER", "Stopping server...")
         self.is_running = False
         
-        # Close server socket
+        # Tutup server socket
         if self.server_socket:
             try:
                 self.server_socket.close()
@@ -134,16 +133,16 @@ class ChatServer:
         """Full server shutdown with cleanup."""
         log_event("SERVER", "Shutting down server...")
         
-        # Stop accepting new connections
+        # Berhenti accept koneksi baru
         self.stop()
         
-        # Disconnect all clients
+        # Disconnect semua client
         with self.clients_lock:
             clients_to_disconnect = list(self.clients.values())
         
         for client in clients_to_disconnect:
             try:
-                # Notify client about server shutdown
+                # Notify client bahwa server shutdown
                 shutdown_packet = create_packet(PacketType.NOTIFICATION, {
                     "notification_type": "server_shutdown",
                     "message": "Server is shutting down"
@@ -153,11 +152,11 @@ class ChatServer:
             except:
                 pass
         
-        # Clear clients dictionary
+        # Clear dictionary client
         with self.clients_lock:
             self.clients.clear()
         
-        # Get final statistics
+        # Data/stat final tentang chatroom
         stats = self.db.get_stats()
         log_event("SERVER", f"Final stats - Users: {stats['total_users']}, "
                            f"Rooms: {stats['active_rooms']}, "
@@ -167,7 +166,7 @@ class ChatServer:
         print("\nServer stopped.")
 
     def _signal_handler(self, signum, frame):
-        """Handle system signals for graceful shutdown."""
+        """Handle signal sistem untuk graceful shutdown."""
         signal_name = "SIGINT" if signum == signal.SIGINT else "SIGTERM"
         log_event("SERVER", f"Received {signal_name}, shutting down...")
         print(f"\nReceived {signal_name}, shutting down gracefully...")
@@ -175,11 +174,7 @@ class ChatServer:
 
     def register_user(self, username: str, client_handler: ClientHandler):
         """
-        Register an authenticated user.
-        
-        Args:
-            username: Username of the user
-            client_handler: ClientHandler instance
+        Register user --yang terotentikasi--
         """
         with self.clients_lock:
             self.clients[username] = client_handler
@@ -188,12 +183,7 @@ class ChatServer:
         print(f"[+] User logged in: {username}")
 
     def unregister_user(self, username: str):
-        """
-        Unregister a disconnected user.
-        
-        Args:
-            username: Username of the user
-        """
+        """ Unregister user yang disconnected  """
         with self.clients_lock:
             if username in self.clients:
                 del self.clients[username]
@@ -202,38 +192,19 @@ class ChatServer:
         print(f"[-] User logged out: {username}")
 
     def is_username_taken(self, username: str) -> bool:
-        """
-        Check if a username is currently in use.
-        
-        Args:
-            username: Username to check
-        
-        Returns:
-            True if username is taken, False otherwise
-        """
         with self.clients_lock:
             return username in self.clients
 
     def get_active_users(self):
-        """Get list of currently active usernames."""
+        """Mengembalikan username dari user-user aktif"""
         with self.clients_lock:
             return list(self.clients.keys())
 
     def get_user_handler(self, username: str) -> Optional[ClientHandler]:
-        """
-        Get the ClientHandler for a specific user.
-        
-        Args:
-            username: Username to look up
-        
-        Returns:
-            ClientHandler instance or None if not found
-        """
         with self.clients_lock:
             return self.clients.get(username)
 
     def get_stats(self) -> Dict:
-        """Get server statistics."""
         with self.clients_lock:
             active_users = len(self.clients)
         
@@ -246,7 +217,7 @@ class ChatServer:
 
 
 def print_server_info():
-    """Print server startup information."""
+    """Print info server di startup."""
     print(r"""
     __  __       _ _   _ _    _ _    _ _            _____ _           _   
     |  \/  |     | | | (_) |  | | |  | (_)          / ____| |         | |  
@@ -255,16 +226,15 @@ def print_server_info():
     | |  | | (_) | | |_| | |  | | |  | | | | | | | | |____| | | | (_| | |_ 
     |_|  |_|\___/|_|\__|_|_|  |_|_|  |_|_|_| |_| |_|\_____|_| |_|\__,_|\__|
     """)
-    print("Multiple Chat Rooms Server v1.0.0")
-    print("Built with Python Socket Programming")
+    print("DodoTalk Server v1.0.0")
+    print("(˶ˆᗜˆ˵) Built with Python Socket Programming!!! (˶ˆᗜˆ˵)")
     print("-" * 50)
 
 
 def main():
-    """Main entry point."""
     import argparse
     
-    # Parse command line arguments
+    # Parsing argumen cmd line 
     parser = argparse.ArgumentParser(description="Multiple Chat Rooms Server")
     parser.add_argument(
         "--host",
@@ -282,7 +252,7 @@ def main():
     # Print server info
     print_server_info()
     
-    # Create and start server
+    # Create & start server
     server = ChatServer(host=args.host, port=args.port)
     
     try:
