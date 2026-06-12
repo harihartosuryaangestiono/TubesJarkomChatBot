@@ -66,7 +66,7 @@ class RoomListItem(QWidget):
         
         layout.addLayout(info_layout, stretch=1)
         
-        # Join button
+        # Tombol join 
         self.join_btn = QPushButton("Join")
         self.join_btn.setStyleSheet(f"""
             QPushButton {{
@@ -129,7 +129,7 @@ class LobbyWindow(QMainWindow):
         sidebar_layout.setContentsMargins(20, 20, 20, 20)
         sidebar_layout.setSpacing(20)
         
-        # App title in sidebar
+        # App title di sidebar
         title_label = QLabel("Chat Rooms")
         title_label.setStyleSheet(f"""
             color: {COLORS['text_primary']};
@@ -166,7 +166,7 @@ class LobbyWindow(QMainWindow):
             20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding
         ))
         
-        # Disconnect button
+        # Tombol disconnect 
         disconnect_btn = QPushButton("Disconnect")
         disconnect_btn.setObjectName("danger")
         disconnect_btn.setCursor(Qt.PointingHandCursor)
@@ -175,7 +175,7 @@ class LobbyWindow(QMainWindow):
         
         main_layout.addWidget(sidebar)
         
-        # Main content area
+        # Area konten utama
         content = QWidget()
         content_layout = QVBoxLayout(content)
         content_layout.setContentsMargins(30, 30, 30, 30)
@@ -201,14 +201,14 @@ class LobbyWindow(QMainWindow):
             40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum
         ))
         
-        # Refresh button
+        # Tombol refresh 
         self.refresh_btn = QPushButton("🔄 Refresh")
         self.refresh_btn.setObjectName("secondary")
         self.refresh_btn.setCursor(Qt.PointingHandCursor)
         self.refresh_btn.clicked.connect(self.refresh_room_list)
         header_layout.addWidget(self.refresh_btn)
         
-        # Create room button
+        # Tombol create room 
         self.create_btn = QPushButton("+ Create Room")
         self.create_btn.setCursor(Qt.PointingHandCursor)
         self.create_btn.clicked.connect(self.on_create_room)
@@ -281,7 +281,7 @@ class LobbyWindow(QMainWindow):
         self.room_list.clear()
         
         if not self.current_rooms:
-            # Show empty state
+            # Tampilkan empty state
             empty_item = QListWidgetItem("No rooms available. Create one!")
             empty_item.setFlags(Qt.NoItemFlags)
             empty_item.setTextAlignment(Qt.AlignCenter)
@@ -293,13 +293,13 @@ class LobbyWindow(QMainWindow):
             owner = room.get("owner", "Unknown")
             member_count = room.get("member_count", 0)
             
-            # Create custom widget for room
+            # Create custom widget untuk room
             room_widget = RoomListItem(room_name, owner, member_count)
             room_widget.join_btn.clicked.connect(
                 lambda checked, r=room_name: self.join_room(r)
             )
             
-            # Add to list
+            # Add ke list
             item = QListWidgetItem()
             item.setSizeHint(room_widget.sizeHint())
             item.setData(Qt.UserRole, room_name)
