@@ -1,6 +1,6 @@
 """
-Chat window for the chat client.
-Main chat interface with message display, user list, and input.
+Chat window untuk chat client
+Main chat interface dengan message display, user list, dan input
 """
 
 import os
@@ -19,7 +19,7 @@ from styles import get_style, COLORS, EMOJIS
 
 
 class EmojiPicker(QDialog):
-    """Emoji picker dialog."""
+    """Emoji picker dialog"""
     
     emoji_selected = pyqtSignal(str)
     
@@ -58,13 +58,13 @@ class EmojiPicker(QDialog):
         layout.addWidget(scroll)
     
     def select_emoji(self, emoji: str):
-        """Handle emoji selection."""
+        """Menangani emoji selection"""
         self.emoji_selected.emit(emoji)
         self.accept()
 
 
 class MessageBubble(QFrame):
-    """Custom message bubble widget."""
+    """Custom message bubble widget"""
     
     def __init__(self, sender: str, message: str, timestamp: str, is_own: bool, parent=None):
         super().__init__(parent)
@@ -142,7 +142,7 @@ class MessageBubble(QFrame):
 
 
 class SystemMessage(QLabel):
-    """System notification message."""
+    """System notification message"""
     
     def __init__(self, message: str, parent=None):
         super().__init__(parent)
@@ -159,7 +159,7 @@ class SystemMessage(QLabel):
 
 
 class ChatWindow(QMainWindow):
-    """Main chat room window."""
+    """Main chat room window"""
     
     back_to_lobby = pyqtSignal()
     
@@ -188,7 +188,7 @@ class ChatWindow(QMainWindow):
         self.typing_timer.setSingleShot(True)
     
     def setup_ui(self):
-        """Setup the user interface."""
+        """Setup user interface"""
         self.setWindowTitle(f"{self.room_name} - Multiple Chat Rooms")
         self.setMinimumSize(1100, 700)
         self.setStyleSheet(get_style("chat"))
@@ -403,7 +403,7 @@ class ChatWindow(QMainWindow):
         self.message_input.setFocus()
     
     def connect_signals(self):
-        """Connect signals and slots."""
+        """Connect signals dan slots"""
         # Client signals
         self.client.message_received.connect(self.on_message_received)
         self.client.typing_indicator.connect(self.on_typing_indicator)
@@ -416,7 +416,7 @@ class ChatWindow(QMainWindow):
         self.client.error_occurred.connect(self.on_error)
     
     def add_message(self, sender: str, message: str, timestamp: str, is_own: bool = False):
-        """Add a message bubble to the chat."""
+        """Menambah message bubble ke chat"""
         bubble = MessageBubble(sender, message, timestamp, is_own)
         
         # Create layout untuk penyelarasan 
@@ -437,7 +437,7 @@ class ChatWindow(QMainWindow):
         QTimer.singleShot(100, self.scroll_to_bottom)
     
     def add_system_message(self, message: str):
-        """Add a system message."""
+        """Menambahkan system message"""
         sys_msg = SystemMessage(message)
         layout = QHBoxLayout()
         layout.addStretch()
@@ -451,12 +451,12 @@ class ChatWindow(QMainWindow):
         QTimer.singleShot(100, self.scroll_to_bottom)
     
     def scroll_to_bottom(self):
-        """Scroll to bottom of messages."""
+        """Scroll messages ke paling bawah"""
         scrollbar = self.messages_scroll.verticalScrollBar()
         scrollbar.setValue(scrollbar.maximum())
     
     def send_message(self):
-        """Send a message."""
+        """Kirim pesan"""
         message = self.message_input.text().strip()
         if message:
             self.client.send_message(self.room_name, message)
@@ -464,28 +464,28 @@ class ChatWindow(QMainWindow):
             self.stop_typing()
     
     def on_typing(self):
-        """Handle typing in input field."""
+        """Menangani typing di input field"""
         if self.message_input.text():
             self.client.send_typing(self.room_name)
             self.typing_timer.start(3000)  # Berhenti mengetik setelah 3 detik
     
     def stop_typing(self):
-        """Send stop typing indicator."""
+        """Kirim stop typing indicator"""
         self.client.stop_typing(self.room_name)
     
     def show_emoji_picker(self):
-        """Show emoji picker dialog."""
+        """Menampilkan emoji picker dialog"""
         picker = EmojiPicker(self)
         picker.emoji_selected.connect(self.insert_emoji)
         picker.exec_()
     
     def insert_emoji(self, emoji: str):
-        """Insert emoji into input field."""
+        """Insert emoji ke input field"""
         self.message_input.insert(emoji)
         self.message_input.setFocus()
     
     def send_file(self):
-        """Send a file."""
+        """Kirim file"""
         file_path, _ = QFileDialog.getOpenFileName(
             self, "Select File to Send",
             "", "Images (*.png *.jpg *.jpeg *.gif);;Documents (*.pdf *.txt *.doc *.docx);;All Files (*.*)"
@@ -524,7 +524,7 @@ class ChatWindow(QMainWindow):
                 QMessageBox.critical(self, "Error", f"Failed to send file: {str(e)}")
     
     def leave_room(self):
-        """Leave the room."""
+        """Meninggalkan room"""
         reply = QMessageBox.question(
             self, "Leave Room",
             f"Leave {self.room_name}?",
@@ -538,7 +538,7 @@ class ChatWindow(QMainWindow):
             self.close()
     
     def close_room(self):
-        """Close the room (owner only)."""
+        """Menutup room (khusus owner)"""
         reply = QMessageBox.warning(
             self, "Close Room",
             f"Close room '{self.room_name}'?\n\nAll members will be returned to the lobby.",
@@ -550,7 +550,7 @@ class ChatWindow(QMainWindow):
             self.client.close_room(self.room_name)
     
     def delete_room(self):
-        """Delete the room (owner only)."""
+        """Hapus room (khusus owner)"""
         reply = QMessageBox.critical(
             self, "Delete Room",
             f"Delete room '{self.room_name}' permanently?\n\nThis cannot be undone!",
@@ -562,7 +562,7 @@ class ChatWindow(QMainWindow):
             self.client.delete_room(self.room_name)
     
     def show_user_context_menu(self, position):
-        """Show context menu for user list."""
+        """Tampilkan context menu untuk user list"""
         if not self.is_owner:
             return
         
@@ -591,7 +591,7 @@ class ChatWindow(QMainWindow):
             menu.exec_(self.user_list.viewport().mapToGlobal(position))
     
     def kick_user(self, username: str):
-        """Kick a user from the room."""
+        """Kick user dari room"""
         reply = QMessageBox.question(
             self, "Kick User",
             f"Kick {username} from the room?",
@@ -604,19 +604,19 @@ class ChatWindow(QMainWindow):
     
     # Signal handlers
     def on_message_received(self, room: str, sender: str, message: str, timestamp: str):
-        """Handle incoming message."""
+        """Menangani pesan masuk"""
         if room == self.room_name:
             is_own = sender == self.client.username
             self.add_message(sender, message, timestamp, is_own)
     
     def on_typing_indicator(self, room: str, typing_users: list):
-        """Handle typing indicator."""
+        """Menangani typing indicator"""
         if room == self.room_name:
             self.typing_users = [u for u in typing_users if u != self.client.username]
             self.update_typing_indicator()
     
     def update_typing_indicator(self):
-        """Update typing indicator label."""
+        """Update typing indicator label"""
         if self.typing_users:
             if len(self.typing_users) == 1:
                 self.typing_label.setText(f"{self.typing_users[0]} is typing...")
@@ -628,13 +628,13 @@ class ChatWindow(QMainWindow):
             self.typing_label.setText("")
     
     def on_user_list_updated(self, room: str, users: list):
-        """Handle user list update."""
+        """Menangani user list update"""
         if room == self.room_name or room == "":
             self.users = users
             self.update_user_list()
     
     def update_user_list(self):
-        """Update the user list widget."""
+        """Update user list widget"""
         self.user_list.clear()
         
         for username in sorted(self.users):
@@ -654,7 +654,7 @@ class ChatWindow(QMainWindow):
         self.user_count_label.setText(f"{len(self.users)} member{'s' if len(self.users) != 1 else ''}")
     
     def on_notification(self, notif_type: str, room: str, message: str):
-        """Handle system notification."""
+        """Menangani system notification"""
         if room == self.room_name or notif_type in ["user_joined", "user_left", "user_kicked"]:
             self.add_system_message(message)
             
@@ -662,7 +662,7 @@ class ChatWindow(QMainWindow):
             self.client.request_user_list(self.room_name)
     
     def on_file_received(self, room: str, sender: str, file_name: str, file_type: str, file_data: str):
-        """Handle received file."""
+        """Menangani received file"""
         if room == self.room_name:
             if file_type == "image":
                 # Tampilkan image
@@ -699,33 +699,33 @@ class ChatWindow(QMainWindow):
                 self.add_message(sender, f"[File: {file_name}]", "", sender == self.client.username)
     
     def on_kicked(self, room: str, message: str):
-        """Handle being kicked from room."""
+        """Menangani saat di kick dari room"""
         if room == self.room_name:
             QMessageBox.warning(self, "Kicked", message)
             self.back_to_lobby.emit()
             self.close()
     
     def on_room_closed(self, room: str, message: str):
-        """Handle room being closed."""
+        """Menangani room being closed"""
         if room == self.room_name:
             QMessageBox.information(self, "Room Closed", message)
             self.back_to_lobby.emit()
             self.close()
     
     def on_disconnected(self, message: str):
-        """Handle disconnection."""
+        """Menangani disconnection"""
         QMessageBox.warning(self, "Disconnected", message)
         self.back_to_lobby.emit()
         self.close()
     
     def on_error(self, message: str):
-        """Handle error."""
+        """Menangani error"""
         # Hanya menampilkan error yang kritis
         if "kick" in message.lower() or "close" in message.lower():
             QMessageBox.critical(self, "Error", message)
     
     def closeEvent(self, event):
-        """Handle window close."""
+        """Menangani window close"""
         # Jangan putuskan koneksi, cukup keluar dari ruangan
         self.client.leave_room(self.room_name)
         self.back_to_lobby.emit()
