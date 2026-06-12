@@ -19,7 +19,7 @@ class ChatClient(QObject):
     Uses Qt signals for GUI integration.
     """
     
-    # Signals for GUI updates
+    # Sinyal untuk update GUI 
     connected = pyqtSignal()
     disconnected = pyqtSignal(str)
     login_response = pyqtSignal(bool, str, str)
@@ -77,7 +77,7 @@ class ChatClient(QObject):
         
         if self.socket:
             try:
-                # Send disconnect packet
+                # kirim disconnect packet
                 self._send_packet({
                     "type": "disconnect",
                     "timestamp": datetime.now().isoformat()
@@ -201,7 +201,7 @@ class ChatClient(QObject):
     
     def send_file(self, room: str, file_name: str, file_data: bytes, file_type: str):
         """Send a file to the room."""
-        # Encode file data to base64
+        # Encode file data menuju base64
         encoded_data = base64.b64encode(file_data).decode('utf-8')
         
         self._send_packet({
@@ -232,7 +232,7 @@ class ChatClient(QObject):
                 if not data:
                     break
                 
-                # Decode and process packet
+                # Decode dan proses packet
                 packet = json.loads(data.decode('utf-8'))
                 self._process_packet(packet)
                 
@@ -312,7 +312,7 @@ class ChatClient(QObject):
             
             self.notification_received.emit(notif_type, room, message)
             
-            # Handle specific notifications
+            # Handle notifikasi spesifik 
             if notif_type == "user_kicked":
                 username = packet.get("username", "")
                 self.kicked_from_room.emit(room, message)
@@ -325,7 +325,7 @@ class ChatClient(QObject):
         
         elif packet_type == "success":
             message = packet.get("message", "")
-            # Could emit a general success signal here
+            # Dapat memancarkan/mengirim sinyal keberhasilan umum di sini
         
         elif packet_type == "file":
             room = packet.get("room", "")
@@ -337,10 +337,10 @@ class ChatClient(QObject):
             self.file_received.emit(room, sender, file_name, file_type, file_data)
         
         elif packet_type == "file_offer":
-            # File offer from another user
+            # File offer dari user lain
             room = packet.get("room", "")
             sender = packet.get("sender", "")
             file_name = packet.get("file_name", "")
             file_size = packet.get("file_size", 0)
             file_type = packet.get("file_type", "")
-            # Could show a file offer dialog here
+            # Dapat menampilkan dialog file offer di sini
